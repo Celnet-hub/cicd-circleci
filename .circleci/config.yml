@@ -62,10 +62,10 @@ jobs:
           name: Back-end build
           command: |
             # Your code here. circle ci will run this command in the docker container.
+            no_output_timeout: 1200
             cd backend
             npm install
             npm run start
-            exit 1
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
