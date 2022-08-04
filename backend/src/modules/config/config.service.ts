@@ -59,7 +59,9 @@ export class ConfigService {
 
 
     if (error) {
-      throw new Error(`Config validation error: ${error.message}`);
+
+      var myError : Error = new Error(`Config validation error: ${error.message}`);
+      throw myError;
     }
 
     return validatedEnvConfig;
