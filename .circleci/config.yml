@@ -63,9 +63,6 @@ jobs:
           command: |
             # Your code here. circle ci will run this command in the docker container.
             cd backend
-            npm cache clean --force
-            rm -rf node_modules
-            rm package-lock.json
             npm install
             npm run start
       - save_cache:
@@ -272,7 +269,7 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
+      #- build-frontend
       - build-backend
 #       - test-frontend:
 #           requires: [build-frontend]
