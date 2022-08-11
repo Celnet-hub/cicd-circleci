@@ -165,13 +165,14 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - run:
-          name: Install tar and gzip
-          command: |
-            yum install -y tar gzip
+      # - run:
+      #     name: Install tar and gzip
+      #     command: |
+      #       yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
+            yum install -y tar gzip
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=udapeople \
