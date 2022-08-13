@@ -3,18 +3,23 @@ version: 2.1
 orbs: 
   slack: circleci/slack@4.10.1
 
-# commands:
-#   destroy-environment:
-#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-#     parameters:
-#       # Add parameter here
-#     steps:
-#       - run:
-#           name: Destroy environments
-#           when: on_fail
-#           command: |
-#             # Your code here
-#             exit 1
+commands:
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    parameters:
+      - name: ID
+        description: Unique identifier.
+        type: String
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_success
+          command: |
+            aws cloudformation delete-stack \
+              --stack-name "udapeople-backend-${ID}"
+            aws cloudformation delete-stack \
+              --stack-name "udapeople-frontend-${ID}"
+            
 
 #   revert-migrations:
 #     description: Revert the last migration if successfully run in the current workflow.
@@ -187,19 +192,24 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
               
-      # - run:
-      #     name: Add back-end ip to ansible inventory
-      #     command: |
-      #       aws ec2 describe-instances \
-      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
-      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #         --output text >> ~/project/.circleci/ansible/inventory.txt
-      #         cat ~/project/.circleci/ansible/inventory.txt
-      # - persist_to_workspace:
-      #     root: ~/
-      #     paths:
-      #       - project/.circleci/ansible/inventory.txt
-      # # Here's where you will add some code to rollback on failure
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text >> ~/project/.circleci/ansible/inventory.txt
+              cat ~/project/.circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      # write code to rollback on failure
+      - destroy-environment:
+          ID: ${CIRCLE_WORKFLOW_ID:0:7}
+
+
+
 
 #   configure-infrastructure:
 #     docker:
