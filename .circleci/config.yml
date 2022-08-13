@@ -8,6 +8,10 @@ commands:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       ID:
+<<<<<<< HEAD
+=======
+        description: Unique identifier.
+>>>>>>> 3796c4318e205b55a26d34fe39f31b7c39035d8d
         type: string
     steps:
       - run:
