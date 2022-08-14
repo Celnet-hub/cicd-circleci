@@ -206,6 +206,17 @@ jobs:
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.11 #ansible needs this image to run
+        environment:
+          NODE_ENV: "local"
+          VERSION: "1"
+          ENVIRONMENT: "production"
+          TYPEORM_CONNECTION: $TYPEORM_CONNECTION
+          TYPEORM_HOST: $TYPEORM_HOST
+          TYPEORM_USERNAME: $TYPEORM_USERNAME
+          TYPEORM_PASSWORD: $TYPEORM_PASSWORD
+          TYPEORM_DATABASE: $TYPEORM_DATABASE
+          TYPEORM_PORT: $TYPEORM_PORT
+          TYPEORM_ENTITIES: $TYPEORM_ENTITIES
     steps:
       # Checkout code
       - checkout
@@ -214,11 +225,13 @@ jobs:
           fingerprint: ["1b:96:0a:c3:11:7c:2b:86:9d:51:f5:5d:fc:73:24:10"]
       # attach workspace
       - attach_workspace:
-          at: ~/project
+          at: ~/
       - run:
           name: Install dependencies
           command: |
             apk update && apk add curl curl-dev 
+            apk add --upgrade bash
+            apk add openssh-client
             apk add tar gzip
             apk add --update ansible 
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
