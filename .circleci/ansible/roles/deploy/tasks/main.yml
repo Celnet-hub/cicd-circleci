@@ -1,4 +1,35 @@
 ---
+  - name: "update local apt repo."
+    become: true
+    apt:
+      update_cache: yes
+  
+  - name: "upgrade apt packages"
+    become: true
+    apt:
+      upgrade: yes
+
+  - name: "remove stale dependecies"
+    become: true
+    apt:
+      autoremove: yes
+
+  - name: "install dependencies [nodejs and npm]"
+    become: true
+    apt:
+      name:["nodejs","npm"]
+      state: latest
+      update_cache: yes
+
+  - name: "install pm2"
+    become: true
+    apt:
+      name:pm2
+      global: yes
+      production: yes
+      state: present
+      update_cache: yes
+    
   - name: install rsync on the ansible controller
     become: yes
     connection: local
@@ -8,25 +39,26 @@
         - rsync
       state: present
       
-  - name: "move files to server"
-    become: yes
-    synchronize:
-      src: /root/project/backend/dist
-      dest: ./udapeople
-      recursive: true
+  - name: "Create Backend App Directory"
+    file:
+      path: ~/backend_app
+      state: directory
 
-  - name: "move node modules"
+  - name: "copy the artifacts into the Backend Instance"
     become: yes
-    synchronize:
-      src: /root/project/backend/node_modules
-      dest: ./udapeople
-      recursive: true
+    copy:
+      src: ~/project/artifact.tar.gz
+      dest: /home/ubuntu/backend_app/artifact.tar.gz
 
   - name: "run server"
     become: true
-    command: pm2 start -f ./main.js
-    args:
-      chdir: ./udapeople/dist
+    shell: |
+      cd /home/ubuntu/backend_app
+      tar xzvf artifact.tar.gz
+      npm install
+      npm run build
+      pm2 stop all
+      pm2 start npm -- start
     environment:
       ENVIRONMENT: production
       TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
