@@ -262,6 +262,7 @@ jobs:
           name: Run migrations
           command: |
             cd backend
+            cat .env
             npm i
             # Run and save the migration output
             npm run build
