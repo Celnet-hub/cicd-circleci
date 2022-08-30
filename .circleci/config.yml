@@ -261,7 +261,6 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            touch .env
             cat .env
             npm i
             # Run and save the migration output
