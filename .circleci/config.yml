@@ -326,7 +326,7 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.10-alpine3.16
     steps:
       - checkout
       # Add ssh keys with fingerprint
@@ -339,8 +339,7 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            apk add --update ansible rsync 
-            apk add curl
+            apk add --update --no-cache ansible rsync curl gzip tar nodejs npm aws-cli
             pip3 install awscli
       - run:
           name: Deploy backend
