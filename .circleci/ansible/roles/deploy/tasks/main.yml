@@ -29,7 +29,6 @@
     name: pm2
     production: true
     state: present
-    update_cache: true
 - 
   become: true
   connection: local
