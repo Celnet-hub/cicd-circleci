@@ -17,9 +17,9 @@
   - name: "install dependencies [nodejs and npm]"
     become: true
     apt:
-      name:["nodejs","npm"]
-      state: latest
-      update_cache: yes
+      pkg:
+        - nodejs
+        - npm
 
   - name: "install pm2"
     become: true
