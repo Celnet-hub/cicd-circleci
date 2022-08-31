@@ -23,9 +23,7 @@
   name: "install dependencies [nodejs and npm]"
 - 
   apt: 
-    global: true
     name: pm2
-    production: true
     state: present
     update_cache: true
   become: true
