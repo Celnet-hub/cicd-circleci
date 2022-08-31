@@ -38,17 +38,22 @@
       - openssh
       - rsync
     state: present
-- 
-  file: 
-    path: ~/backend_app
-    state: directory
-  name: "Create Backend App Directory"
+# - 
+#   file: 
+#     path: ~/backend_app
+#     state: directory
+#   name: "Create Backend App Directory"
 - 
   become: true
   copy: 
-    dest: /home/ubuntu/backend_app/artifact.tar.gz
+    dest: /home/ubuntu/
     src: ~/project/artifact.tar.gz
   name: "copy the artifacts into the Backend Instance"
+
+- name: "extract artifact"
+  unarchive:
+    src: ~/project/artifact.tar.gz
+    dest: /home/ubuntu/
 - 
   args: 
     chdir: /home/ubuntu/dist
