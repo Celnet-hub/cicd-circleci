@@ -21,13 +21,15 @@
       - npm
   become: true
   name: "install dependencies [nodejs and npm]"
-# - 
-#   apt: 
-#     name: pm2
-#     state: present
-#     update_cache: true
-#   become: true
-#   name: "install pm2"
+- 
+  npm: 
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+    update_cache: true
+  become: true
+  name: "install pm2"
 - 
   become: true
   connection: local
@@ -50,17 +52,17 @@
   name: "copy the artifacts into the Backend Instance"
 - 
   become: true
-  environment: 
-    ENVIRONMENT: production
-    TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-    TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-    TYPEORM_ENTITIES: ./modules/domain/**/*.entity.js
-    TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-    TYPEORM_MIGRATIONS: ./migrations/*.js
-    TYPEORM_MIGRATIONS_DIR: ./migrations
-    TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-    TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-    TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+    environment:
+      ENVIRONMENT: production
+      TYPEORM_CONNECTION: postgres
+      TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/dist/migrations"
+      TYPEORM_MIGRATIONS: "/home/ubuntu/dist/migrations/*.js"
+      TYPEORM_ENTITIES: "/home/ubuntu/dist/modules/domain/**/*.entity{.ts,.js}"
+      TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+      TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+      TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+      TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+      TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
   name: "run server"
   shell: |
       cd /home/ubuntu/backend_app
@@ -69,3 +71,5 @@
       npm run build
       pm2 stop all
       pm2 start npm -- start
+  args:
+      chdir: /home/ubuntu/dist

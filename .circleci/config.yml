@@ -31,8 +31,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(curl --insecure "https://kvdb.io/9d2Brw9Qt3fk5fzoFG35vo/migration_<<parameters.id>>")
-            SUCCESS = 1
+            SUCCESS=$(curl --insecure https://kvdb.io/9d2Brw9Qt3fk5fzoFG35vo/migration_<<parameters.id>>)
             if(( $SUCCESS==1 ));
             then
              cd ~/project/backend
@@ -371,22 +370,35 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl
+            apk add --update curl nodejs npm
             pip install awscli
+            npm install pm2 -g
+      - run:
+          name: Get backend url
+          command: |
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --output text)
       - run:
           name: Backend smoke test.
           command: |
             # your code here
+
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --output text)
           
-            export backend_url=$(curl --insecure  https://kvdb.io/9d2Brw9Qt3fk5fzoFG35vo/backend_url)
-            echo $backend_url
+            export backend_url="http://${BACKEND_IP}:3030"
+            echo "${backend_url}"
             echo "$backend_url/api/status"
             curl "$backend_url/api/status"
-            if curl "$backend_url/api/status" | grep "ok"
+            if curl "${backend_url}/api/status" | grep "ok"
             then
-              exit 0
+              return 0
             else
-              exit 1
+              return 1
             fi
       - run:
           name: Frontend smoke test.
@@ -395,7 +407,7 @@ jobs:
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"
             if curl -s ${URL} | grep "Welcome"
             then
-              return 0
+              return 1
             else
               return 1
             fi
