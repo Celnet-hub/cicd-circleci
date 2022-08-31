@@ -341,6 +341,7 @@ jobs:
             # your code here
             apk add --update --no-cache ansible rsync curl gzip tar nodejs npm aws-cli
             pip3 install awscli
+            npm install pm2 -g
       - run:
           name: Deploy backend
           command: |
