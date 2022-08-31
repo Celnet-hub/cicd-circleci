@@ -21,13 +21,13 @@
       - npm
   become: true
   name: "install dependencies [nodejs and npm]"
-- 
-  apt: 
-    name: pm2
-    state: present
-    update_cache: true
-  become: true
-  name: "install pm2"
+# - 
+#   apt: 
+#     name: pm2
+#     state: present
+#     update_cache: true
+#   become: true
+#   name: "install pm2"
 - 
   become: true
   connection: local
