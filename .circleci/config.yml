@@ -31,7 +31,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(curl --insecure https://kvdb.io/9d2Brw9Qt3fk5fzoFG35vo/migration_<<parameters.id>>)
+            SUCCESS=$(curl --insecure https://kvdb.io/szLMF4KVmykKrCL6nE9mK/migration_<<parameters.id>>)
             if(( $SUCCESS==1 ));
             then
              cd ~/project/backend
@@ -260,11 +260,13 @@ jobs:
           name: Run migrations
           command: |
             cd backend
+            pwd
             ls -la
             npm i
             # Run and save the migration output
             npm run build
             npm run migrations > migrations_dump.txt
+            ls -la
             cat migrations_dump.txt
       - run:
           name: Send migration results to kvdb.io
@@ -273,10 +275,10 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               echo "Migrations ran successfully"
-              curl https://kvdb.io/9d2Brw9Qt3fk5fzoFG35vo/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/szLMF4KVmykKrCL6nE9mK/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             else
               echo "Migration failed"
-              curl --insecure https://kvdb.io/9d2Brw9Qt3fk5fzoFG35vo/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
+              curl --insecure https://kvdb.io/szLMF4KVmykKrCL6nE9mK/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
             fi
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
@@ -305,7 +307,7 @@ jobs:
             --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
             --output text 
             )
-            # API_URL=$(curl --insecure  https://kvdb.io/9d2Brw9Qt3fk5fzoFG35vo/backend_url)
+            # API_URL=$(curl --insecure  https://kvdb.io/szLMF4KVmykKrCL6nE9mK/backend_url)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
@@ -472,10 +474,10 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
       - deploy-backend:
           requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations,deploy-backend]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
 #       - cloudfront-update:

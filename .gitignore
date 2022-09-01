@@ -68,7 +68,8 @@ node_modules
 
 
 dist
-
+*.env
+*.env.sample
 aws/
 *.zip
 
