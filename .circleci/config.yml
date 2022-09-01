@@ -372,9 +372,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl nodejs npm
+            apk add --update curl nodejs npm openssh
             pip install awscli
-            npm install pm2 -g
       - run:
           name: Get backend url
           command: |
