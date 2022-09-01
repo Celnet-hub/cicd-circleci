@@ -190,29 +190,64 @@ jobs:
       - revert-migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}   
 
+  # configure-infrastructure:
+  #   docker:
+  #     - image: python:3.9.0-alpine
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["e3:c0:30:a5:94:3c:30:7d:41:05:ad:8a:a3:7c:87:1c"]
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           apk add --update ansible 
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           cd .circleci/ansible
+  #           cat inventory.txt
+  #           ansible-playbook -i inventory.txt configure-server.yml
+  #     - destroy-environment:
+  #         id: ${CIRCLE_WORKFLOW_ID:0:7}      
+  #     - revert-migrations:
+  #         id: ${CIRCLE_WORKFLOW_ID:0:7}
+
   configure-infrastructure:
     docker:
-      - image: python:3.9.0-alpine
+      - image: python:3.7-alpine3.11 #ansible needs this image to run
     steps:
+      # Checkout code
       - checkout
+      # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["e3:c0:30:a5:94:3c:30:7d:41:05:ad:8a:a3:7c:87:1c"]
+          fingerprint: ["e3:c0:30:a5:94:3c:30:7d:41:05:ad:8a:a3:7c:87:1c"]
+      # attach workspace
       - attach_workspace:
           at: .
       - run:
           name: Install dependencies
           command: |
+            apk update && apk add curl curl-dev 
+            apk add --upgrade bash
+            apk add openssh-client
+            apk add tar gzip
             apk add --update ansible 
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
       - run:
           name: Configure server
           command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt configure-server.yml
+            cat .circleci/ansible/inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            
+      # Here's where you will add some code to rollback on failure
       - destroy-environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}      
-      - revert-migrations:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
+
 
   run-migrations:
     docker:
