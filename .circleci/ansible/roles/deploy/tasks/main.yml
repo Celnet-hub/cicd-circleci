@@ -9,7 +9,7 @@
   # extract the tar/zipped file
   - name: 'extract the tar/zipped file'
     unarchive:
-      src: /home/circleci/project/artifact.tar.gz
+      src: ~/project/artifact.tar.gz
       dest: /home/ubuntu/backend-app
 
   - name: "copy artifact to ec2"
