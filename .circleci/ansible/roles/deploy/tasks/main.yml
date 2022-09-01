@@ -72,6 +72,3 @@
       TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
       TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
       TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}" 
-  # to be able to see pm2 logs
-- debug:
-    msg: "{{ backend_app.stdout_lines }}"
