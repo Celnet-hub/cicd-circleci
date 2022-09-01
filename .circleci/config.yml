@@ -256,6 +256,11 @@ jobs:
             cat .circleci/ansible/inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+      
+      - persist_to_workspace:
+          root: .
+          paths:
+            - project/
             
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
@@ -267,6 +272,10 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - attach_workspace:
+          at: .
       - run:
           name: Run migrations
           command: |
