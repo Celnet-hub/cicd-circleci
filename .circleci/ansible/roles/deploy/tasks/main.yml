@@ -1,78 +1,53 @@
---- 
-- 
-  apt: 
-    update_cache: true
-  become: true
-  name: "update local apt repo."
-- 
-  apt: 
-    upgrade: true
-  become: true
-  name: "upgrade apt packages"
-- 
-  apt: 
-    autoremove: true
-  become: true
-  name: "remove stale dependecies"
-- 
-  apt: 
-    pkg: 
-      - nodejs
-      - npm
-  become: true
-  name: "install dependencies [nodejs and npm]"
-- 
-  become: true
-  name: "install pm2"
-  npm: 
-    global: true
-    name: pm2
-    production: true
-    state: present
-- 
-  become: true
-  connection: local
-  name: "install rsync on the ansible controller"
-  package: 
-    name: 
-      - openssh
-      - rsync
-    state: present
-# - 
-#   file: 
-#     path: ~/backend_app
-#     state: directory
-#   name: "Create Backend App Directory"
-- 
-  become: true
-  copy: 
-    dest: /home/ubuntu/
-    src: ~/project/artifact.tar.gz
-  name: "copy the artifacts into the Backend Instance"
+---
+  - name: "show remote environment"
+    shell: env
+  - name: "copy artifact to ec2"
+    become: yes
+    synchronize:
+      src: ~/project/artifact.tar.gz
+      dest: /home/ubuntu
+      recursive: true
+  - name: "extract artifact"
+    unarchive:
+      src: ~/project/artifact.tar.gz
+      dest: /home/ubuntu
+  - name: "Update packages."
+    become: true
+    apt:
+      update_cache: yes
 
-- name: "extract artifact"
-  unarchive:
-    src: ~/project/artifact.tar.gz
-    dest: /home/ubuntu/
-- 
-  args: 
-    chdir: /home/ubuntu/dist
-  become: true
-  environment: 
-    ENVIRONMENT: production
-    TYPEORM_CONNECTION: postgres
-    TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-    TYPEORM_ENTITIES: "/home/ubuntu/dist/modules/domain/**/*.entity{.ts,.js}"
-    TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-    TYPEORM_MIGRATIONS: /home/ubuntu/dist/migrations/*.js
-    TYPEORM_MIGRATIONS_DIR: /home/ubuntu/dist/migrations
-    TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-    TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-    TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-  name: "run server"
-  shell: |
-      tar xzvf artifact.tar.gz
-      npm install
-      npm run build
-      pm2 stop all
-      pm2 start npm -- start
+  - name: "upgrade packages."
+    become: true
+    apt:
+      upgrade: "yes"
+
+  - name: "install dependencies."
+    become: true
+    apt:
+      name: ["nodejs", "npm"]
+      state: latest
+      update_cache: yes
+
+  - name: "install pm2"
+    become: true
+    npm:
+      name: pm2
+      global: yes
+      production: yes
+      state: present
+  - name: "start server"
+    become: true
+    command: pm2 start -f ./main.js
+    args:
+      chdir: /home/ubuntu/dist
+    environment:
+      ENVIRONMENT: production
+      TYPEORM_CONNECTION: postgres
+      TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/dist/migrations"
+      TYPEORM_MIGRATIONS: "/home/ubuntu/dist/migrations/*.js"
+      TYPEORM_ENTITIES: "/home/ubuntu/dist/modules/domain/**/*.entity{.ts,.js}"
+      TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+      TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+      TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+      TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+      TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}" 
