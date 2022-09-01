@@ -71,7 +71,6 @@
     TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
   name: "run server"
   shell: |
-      cd /home/ubuntu/backend_app
       tar xzvf artifact.tar.gz
       npm install
       npm run build
