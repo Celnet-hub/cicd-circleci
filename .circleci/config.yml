@@ -372,7 +372,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl nodejs npm openssh
+            apk add --update --no-cache curl nodejs npm openssh
             pip install awscli
       - run:
           name: Get backend url

@@ -1,16 +1,24 @@
 ---
   - name: "show remote environment"
     shell: env
+  - name: Make backend-app directory
+    file:
+      path: /home/ubuntu/backend-app
+      state: directory
+
+  # extract the tar/zipped file
+  - name: 'extract the tar/zipped file'
+    unarchive:
+      src: /home/circleci/project/artifact.tar.gz
+      dest: /home/ubuntu/backend-app
+
   - name: "copy artifact to ec2"
     become: yes
     synchronize:
       src: ~/project/artifact.tar.gz
       dest: /home/ubuntu
       recursive: true
-  - name: "extract artifact"
-    unarchive:
-      src: ~/project/artifact.tar.gz
-      dest: /home/ubuntu
+
   - name: "Update packages."
     become: true
     apt:
@@ -35,14 +43,24 @@
       global: yes
       production: yes
       state: present
-  - name: "start server"
+  
+  # install backend dependencies
+  - name: 'install backend-app dependencies'
     become: true
     shell: |
+      cd /home/ubuntu/backend-app
+      npm install
+
+  - name: 'start the app'
+    become: true
+    shell: |
+      cd /home/ubuntu/backend-app
       pm2 stop default
       pm2 start npm -- start
-    args:
-      chdir: /home/ubuntu/dist
+    register: backend_app 
     environment:
+      NODE_ENV: production
+      VERSION: production
       ENVIRONMENT: production
       TYPEORM_CONNECTION: postgres
       TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/dist/migrations"
@@ -53,3 +71,6 @@
       TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
       TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
       TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}" 
+  # to be able to see pm2 logs
+- debug:
+    msg: "{{ backend_app.stdout_lines }}"
