@@ -58,9 +58,10 @@
       pm2 stop default
       pm2 start npm -- start
     register: backend_app 
+
     environment:
       NODE_ENV: production
-      VERSION: production
+      # VERSION: production
       ENVIRONMENT: production
       TYPEORM_CONNECTION: postgres
       TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/dist/migrations"
