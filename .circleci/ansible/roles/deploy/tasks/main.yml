@@ -61,12 +61,12 @@
 
     environment:
       NODE_ENV: production
-      # VERSION: production
+      VERSION: production
       ENVIRONMENT: production
       TYPEORM_CONNECTION: postgres
-      TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/dist/migrations"
-      TYPEORM_MIGRATIONS: "/home/ubuntu/dist/migrations/*.js"
-      TYPEORM_ENTITIES: "/home/ubuntu/dist/modules/domain/**/*.entity{.ts,.js}"
+      TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/backend-app/dist/migrations"
+      TYPEORM_MIGRATIONS: "/home/ubuntu/backend-app/dist/migrations/*.js"
+      TYPEORM_ENTITIES: "/home/ubuntu/backend-app/dist/modules/domain/**/*.entity{.ts,.js}"
       TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
       TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
       TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
