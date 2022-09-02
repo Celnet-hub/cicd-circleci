@@ -50,7 +50,7 @@
     shell: |
       cd /home/ubuntu/backend-app
       npm install
-      
+
   - name: 'Where are we?'
     become: yes
     shell: | 
@@ -69,18 +69,14 @@
 
     register: backend_app
 
-
-
-    # environment:
-    #   NODE_ENV: production
-    #   VERSION: production
-    #   ENVIRONMENT: production
-    #   TYPEORM_CONNECTION: postgres
-    #   TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/backend-app/dist/migrations"
-    #   TYPEORM_MIGRATIONS: "/home/ubuntu/backend-app/dist/migrations/*.js"
-    #   TYPEORM_ENTITIES: "/home/ubuntu/backend-app/dist/modules/domain/**/*.entity{.ts,.js}"
-    #   TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-    #   TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-    #   TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-    #   TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-    #   TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}" 
+    environment:
+      ENVIRONMENT: production
+      TYPEORM_CONNECTION: postgres
+      TYPEORM_MIGRATIONS_DIR: "/home/ubuntu/backend-app/dist/migrations"
+      TYPEORM_MIGRATIONS: "/home/ubuntu/backend-app/dist/migrations/*.js"
+      TYPEORM_ENTITIES: "/home/ubuntu/backend-app/dist/modules/domain/**/*.entity{.ts,.js}"
+      TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
+      TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
+      TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
+      TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
+      TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}" 
