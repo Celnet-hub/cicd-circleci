@@ -232,7 +232,7 @@ jobs:
             apk update && apk add curl curl-dev 
             apk add --upgrade bash
             apk add openssh-client
-            apk add -- update --no-cache tar gzip
+            apk add --update --no-cache tar gzip
             apk add --update --no-cache ansible aws-cli openssh
       - run:
           name: Configure server
