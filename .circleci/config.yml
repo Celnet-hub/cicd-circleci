@@ -280,7 +280,7 @@ jobs:
             else
               echo "Migration failed"
               cat ~/project/backend/migrations_dump.txt
-              curl --insecure https://kvdb.io/szLMF4KVmykKrCL6nE9mK/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl --insecure https://kvdb.io/szLMF4KVmykKrCL6nE9mK/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
             fi
       - destroy-environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
